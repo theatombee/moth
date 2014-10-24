@@ -2,8 +2,20 @@
 #include <iostream>
 #include "moth/reporter/reporter.hpp"
 #include "moth/type/address/base.hpp"
+#include "moth/type/address/ipv4.hpp"
+#include "moth/type/address/mac.hpp"
 
-using ipv4_t = moth::type::address::base_t<uint8_t,uint32_t,4>;
+/*
+  template<typename cell_type_tt,
+                     typename concat_type_tt,
+                     int size_tp,
+                     char delim_tp,
+                     typename stringifier_tf,
+                     typename parser_tf>
+ */
+
+
+using ipv4_t = moth::type::address::ipv4_t;
 
 int main()
 {
@@ -20,4 +32,13 @@ int main()
     {
         std::cout << "wrong!" << std::endl;
     }
+
+    std::cout << "iterate over ip 1" << std::endl;
+    size_t l_count(0);
+    for (ipv4_t::iterator l_it = lIpAddr1.begin(); l_it != lIpAddr1.end(); l_it++)
+    {
+        std::cout << "[" << (l_count++) << "]=" << std::hex << (int)*l_it << std::endl;
+    }
+    ipv4_t::concat_t l_int1 = lIpAddr1;
+    std::cout << std::hex << l_int1 << std::endl;
 }
