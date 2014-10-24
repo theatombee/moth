@@ -2,6 +2,9 @@
 #define MOTH_INCLUDE_TYPE_ADDRESS_ADRESS_HPP
 #include <stddef.h>
 #include <cstddef>
+#include <cstdlib>
+#include <cstring>
+
 #include "moth/reporter/reporter.hpp"
 
 namespace moth
@@ -17,7 +20,11 @@ namespace moth
 
                     enum
                     {
-                        SIZE = S, CELL_SIZE = sizeof(T), NUM_OF_BYTES = (SIZE * CELL_SIZE),
+                        SIZE = S,
+                        CELL_SIZE = sizeof(T),
+                        NUM_OF_BYTES = (SIZE * CELL_SIZE),
+                        CONCAT_SIZE = sizeof(N),
+                        CONCAT_OFFSET = (NUM_OF_BYTES - CONCAT_SIZE),
                     };
 
                     using concat_t = N;
@@ -41,7 +48,7 @@ namespace moth
                         set(a_in_that);
                     }
 
-                    address_t(concat_t const *a_in)
+                    address_t(const concat_t& a_in)
                     {
                         set(a_in);
                     }
@@ -63,7 +70,8 @@ namespace moth
 
                     inline address_t &set(concat_t const &a_in)
                     {
-                        memcpy(impl, &a_in, NUM_OF_BYTES);
+                        uint8_t* l_bytes = (uint8_t*) &a_in;
+                        memcpy(impl, l_bytes + CONCAT_OFFSET, NUM_OF_BYTES);
                         return *this;
                     }
 
@@ -133,7 +141,16 @@ namespace moth
 
                     inline void to_concat_t(concat_t &a_out) const
                     {
-                        memcpy(&a_out, impl, NUM_OF_BYTES);
+                        uint8_t* l_bytes = (uint8_t*) &a_out;
+                        memset(l_bytes, 0, CONCAT_OFFSET);
+                        memcpy(l_bytes + CONCAT_OFFSET, impl, NUM_OF_BYTES);
+                    }
+
+                    inline concat_t to_concat_t() const
+                    {
+                        concat_t l_ret;
+                        to_concat_t(l_ret);
+                        return l_ret;
                     }
 
                     inline void to_impl_t(impl_t &a_out) const
@@ -148,6 +165,53 @@ namespace moth
                         return l_diff;
                     }
 
+                    std::size_t hash_value() const
+                    {
+                        std::size_t lSeed = 0;
+                        for(const_iterator i=begin(); i != end(); ++i)
+                        {
+                            lSeed ^= static_cast<std::size_t>(*i) + 0x9e3779b9 + (lSeed << 6) + (lSeed >> 2);
+                        }
+                        return lSeed;
+                    }
+
+                    ///////////////////////////////////////////////////////////////////
+                    // STANDARD ITERATORS
+                    ///////////////////////////////////////////////////////////////////
+
+                    inline iterator begin()
+                    {
+                        return impl;
+                    }
+
+                    inline iterator end()
+                    {
+                        return (impl + SIZE);
+                    }
+
+                    inline const_iterator begin() const
+                    {
+                        return (const_iterator) impl;
+                    }
+
+                    inline const_iterator end() const
+                    {
+                        return (const_iterator) (impl + SIZE);
+                    }
+
+                    inline size_type size() const
+                    {
+                        return SIZE;
+                    }
+
+                    inline bool is_nil() const
+                    {
+                        bool l_ret = true;
+                        for (int i=0;
+                             i < SIZE && (l_ret = (0 == impl[i]));
+                             i++);
+                        return l_ret;
+                    }
                 protected:
 
                     inline static bool check_range(int a_in_index)
@@ -160,6 +224,50 @@ namespace moth
                     impl_t impl;
             };
         }
+    }
+}
+
+template<typename T, typename N, int S>
+bool operator<(const moth::type::address::address_t<T,N,S>& a_in_lhs,
+                  const moth::type::address::address_t<T,N,S>& a_in_rhs)
+{
+    return 0 < a_in_lhs.compare(a_in_rhs);
+}
+
+template<typename T, typename N, int S>
+bool operator>(const moth::type::address::address_t<T,N,S>& a_in_lhs,
+                  const moth::type::address::address_t<T,N,S>& a_in_rhs)
+{
+    return 0 > a_in_lhs.compare(a_in_rhs);
+}
+
+template<typename T, typename N, int S>
+bool operator<=(const moth::type::address::address_t<T,N,S>& a_in_lhs,
+                  const moth::type::address::address_t<T,N,S>& a_in_rhs)
+{
+    return 0 <= a_in_lhs.compare(a_in_rhs);
+}
+
+template<typename T, typename N, int S>
+bool operator>=(const moth::type::address::address_t<T,N,S>& a_in_lhs,
+                  const moth::type::address::address_t<T,N,S>& a_in_rhs)
+{
+    return 0 >= a_in_lhs.compare(a_in_rhs);
+}
+
+template<typename T, typename N, int S>
+bool operator==(const moth::type::address::address_t<T,N,S>& a_in_lhs,
+                  const moth::type::address::address_t<T,N,S>& a_in_rhs)
+{
+    return 0 == a_in_lhs.compare(a_in_rhs);
+}
+
+namespace boost
+{
+    template<typename T, typename N, int S>
+    inline std::size_t hash_value(const moth::type::address::address_t<T,N,S>& a_in)
+    {
+        return a_in.hash_value();
     }
 }
 
