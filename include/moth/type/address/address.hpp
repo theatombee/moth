@@ -2,7 +2,7 @@
 #define MOTH_INCLUDE_TYPE_ADDRESS_ADRESS_HPP
 #include <stddef.h>
 #include <cstddef>
-#inlucde "moth/reporter/reporter.hpp"
+#include "moth/reporter/reporter.hpp"
 
 namespace moth
 {
@@ -106,8 +106,10 @@ namespace moth
                     {
                         moth::reporter::check(
                                 check_range(a_in),
-                                mxreport::Severity::ERROR, "index out of range");
-                        return impl[i];
+                                moth::reporter::severity_t::ERROR,
+                                "index out of range");
+
+                        return impl[a_in];
                     }
 
                     inline const cell_t get(int i) const
