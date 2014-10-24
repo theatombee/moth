@@ -1,9 +1,9 @@
 #include <cstdint>
 #include <iostream>
 #include "moth/reporter/reporter.hpp"
-#include "moth/type/address/address.hpp"
+#include "moth/type/address/base.hpp"
 
-using ipv4_t = moth::type::address::address_t<uint8_t,uint32_t,4>;
+using ipv4_t = moth::type::address::base_t<uint8_t,uint32_t,4>;
 
 int main()
 {

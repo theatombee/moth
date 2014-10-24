@@ -1,5 +1,5 @@
-#ifndef MOTH_INCLUDE_TYPE_ADDRESS_ADRESS_HPP
-#define MOTH_INCLUDE_TYPE_ADDRESS_ADRESS_HPP
+#ifndef MOTH_INCLUDE_TYPE_ADDRESS_BASE_HPP
+#define MOTH_INCLUDE_TYPE_ADDRESS_BASE_HPP
 #include <stddef.h>
 #include <cstddef>
 #include <cstdlib>
@@ -14,7 +14,7 @@ namespace moth
         namespace address
         {
             template<typename T, typename N, int S>
-            struct address_t
+            struct base_t
             {
                 public:
 
@@ -43,17 +43,17 @@ namespace moth
                     // CONSTRUCTORS
                     ///////////////////////////////////////////////////////////////////
 
-                    address_t(const impl_t &a_in_that)
+                    base_t(const impl_t &a_in_that)
                     {
                         set(a_in_that);
                     }
 
-                    address_t(const concat_t& a_in)
+                    base_t(const concat_t& a_in)
                     {
                         set(a_in);
                     }
 
-                    address_t(const address_t &a_in_that)
+                    base_t(const base_t &a_in_that)
                     {
                         set(a_in_that);
                     }
@@ -62,36 +62,36 @@ namespace moth
                     // MUTATORS
                     ///////////////////////////////////////////////////////////////////
 
-                    inline address_t &set(const impl_t &a_in_that)
+                    inline base_t &set(const impl_t &a_in_that)
                     {
                         memcpy(impl, a_in_that, NUM_OF_BYTES);
                         return *this;
                     }
 
-                    inline address_t &set(concat_t const &a_in)
+                    inline base_t &set(concat_t const &a_in)
                     {
                         uint8_t* l_bytes = (uint8_t*) &a_in;
                         memcpy(impl, l_bytes + CONCAT_OFFSET, NUM_OF_BYTES);
                         return *this;
                     }
 
-                    inline address_t &set(const address_t &a_in)
+                    inline base_t &set(const base_t &a_in)
                     {
                         set(a_in.impl);
                         return *this;
                     }
 
-                    inline address_t operator=(const impl_t &a_in_that)
+                    inline base_t operator=(const impl_t &a_in_that)
                     {
                         return set(a_in_that);
                     }
 
-                    inline address_t operator=(concat_t const &a_in)
+                    inline base_t operator=(concat_t const &a_in)
                     {
                         return set(a_in);
                     }
 
-                    inline address_t operator=(const address_t &a_in)
+                    inline base_t operator=(const base_t &a_in)
                     {
                         return set(a_in);
                     }
@@ -158,7 +158,7 @@ namespace moth
                         memcpy(a_out, impl, NUM_OF_BYTES);
                     }
 
-                    cell_t compare(const address_t &a_in_that) const
+                    cell_t compare(const base_t &a_in_that) const
                     {
                         cell_t l_diff = 0;
                         for (int i = 0; i < SIZE && !(l_diff = impl[i] - a_in_that.impl[i]); i++);
@@ -228,36 +228,36 @@ namespace moth
 }
 
 template<typename T, typename N, int S>
-bool operator<(const moth::type::address::address_t<T,N,S>& a_in_lhs,
-                  const moth::type::address::address_t<T,N,S>& a_in_rhs)
+bool operator<(const moth::type::address::base_t<T,N,S>& a_in_lhs,
+                  const moth::type::address::base_t<T,N,S>& a_in_rhs)
 {
     return 0 < a_in_lhs.compare(a_in_rhs);
 }
 
 template<typename T, typename N, int S>
-bool operator>(const moth::type::address::address_t<T,N,S>& a_in_lhs,
-                  const moth::type::address::address_t<T,N,S>& a_in_rhs)
+bool operator>(const moth::type::address::base_t<T,N,S>& a_in_lhs,
+                  const moth::type::address::base_t<T,N,S>& a_in_rhs)
 {
     return 0 > a_in_lhs.compare(a_in_rhs);
 }
 
 template<typename T, typename N, int S>
-bool operator<=(const moth::type::address::address_t<T,N,S>& a_in_lhs,
-                  const moth::type::address::address_t<T,N,S>& a_in_rhs)
+bool operator<=(const moth::type::address::base_t<T,N,S>& a_in_lhs,
+                  const moth::type::address::base_t<T,N,S>& a_in_rhs)
 {
     return 0 <= a_in_lhs.compare(a_in_rhs);
 }
 
 template<typename T, typename N, int S>
-bool operator>=(const moth::type::address::address_t<T,N,S>& a_in_lhs,
-                  const moth::type::address::address_t<T,N,S>& a_in_rhs)
+bool operator>=(const moth::type::address::base_t<T,N,S>& a_in_lhs,
+                  const moth::type::address::base_t<T,N,S>& a_in_rhs)
 {
     return 0 >= a_in_lhs.compare(a_in_rhs);
 }
 
 template<typename T, typename N, int S>
-bool operator==(const moth::type::address::address_t<T,N,S>& a_in_lhs,
-                  const moth::type::address::address_t<T,N,S>& a_in_rhs)
+bool operator==(const moth::type::address::base_t<T,N,S>& a_in_lhs,
+                  const moth::type::address::base_t<T,N,S>& a_in_rhs)
 {
     return 0 == a_in_lhs.compare(a_in_rhs);
 }
@@ -265,7 +265,7 @@ bool operator==(const moth::type::address::address_t<T,N,S>& a_in_lhs,
 namespace boost
 {
     template<typename T, typename N, int S>
-    inline std::size_t hash_value(const moth::type::address::address_t<T,N,S>& a_in)
+    inline std::size_t hash_value(const moth::type::address::base_t<T,N,S>& a_in)
     {
         return a_in.hash_value();
     }
