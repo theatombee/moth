@@ -13,6 +13,7 @@
 #include <arpa/inet.h>
 
 #include "moth/reporter/reporter.hpp"
+#include "moth/type/container/fixed_array.hpp"
 
 namespace moth
 {
@@ -40,7 +41,7 @@ namespace moth
 
                     using concat_t = concat_type_tt;
                     using cell_t = cell_type_tt;
-                    using impl_t = cell_t[SIZE];
+                    using impl_t = moth::type::container::fixed_array_t<cell_t, SIZE>;
 
                     using value_type = cell_t;
                     using reference = cell_t &;
@@ -85,7 +86,7 @@ namespace moth
 
                     inline base_t& set(const impl_t& a_in_that)
                     {
-                        memcpy(impl, a_in_that, NUM_OF_BYTES);
+                        impl = a_in_that;
                         return *this;
                     }
 
@@ -154,11 +155,6 @@ namespace moth
 
                     inline cell_t& get(int a_in)
                     {
-                        moth::reporter::check(
-                                check_range(a_in),
-                                moth::reporter::severity_t::ERROR,
-                                "index out of range");
-
                         return impl[a_in];
                     }
 
@@ -200,24 +196,17 @@ namespace moth
 
                     inline void to_impl_t(impl_t& a_out) const
                     {
-                        memcpy(a_out, impl, NUM_OF_BYTES);
+                        a_out = impl;
                     }
 
                     cell_t compare(const base_t& a_in_that) const
                     {
-                        cell_t l_diff = 0;
-                        for (int i = 0; i < SIZE && !(l_diff = impl[i] - a_in_that.impl[i]); i++);
-                        return l_diff;
+                        return impl.compare(a_in_that.impl);
                     }
 
                     std::size_t hash_value() const
                     {
-                        std::size_t lSeed = 0;
-                        for(const_iterator i=begin(); i != end(); ++i)
-                        {
-                            lSeed ^= static_cast<std::size_t>(*i) + 0x9e3779b9 + (lSeed << 6) + (lSeed >> 2);
-                        }
-                        return lSeed;
+                        return impl.hash_value();
                     }
 
                     inline void to_string(char* a_out) const
@@ -241,42 +230,32 @@ namespace moth
 
                     inline iterator begin()
                     {
-                        return impl;
+                        return impl.begin();
                     }
 
                     inline iterator end()
                     {
-                        return (impl + SIZE);
+                        return impl.end();
                     }
 
                     inline const_iterator begin() const
                     {
-                        return (const_iterator) impl;
+                        return (const_iterator) impl.begin();
                     }
 
                     inline const_iterator end() const
                     {
-                        return (const_iterator) (impl + SIZE);
+                        return (const_iterator) impl.end();
                     }
 
                     inline size_type size() const
                     {
-                        return SIZE;
+                        return impl.size();
                     }
 
                     inline bool is_nil() const
                     {
-                        bool l_ret = true;
-                        for (int i=0;
-                             i < SIZE && (l_ret = (0 == impl[i]));
-                             i++);
-                        return l_ret;
-                    }
-                protected:
-
-                    inline static bool check_range(int a_in_index)
-                    {
-                        return -1 < a_in_index && a_in_index < SIZE;
+                        return impl.is_nil();
                     }
 
                 private:

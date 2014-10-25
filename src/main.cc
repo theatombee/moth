@@ -4,6 +4,7 @@
 #include "moth/type/address/base.hpp"
 #include "moth/type/address/ipv4.hpp"
 #include "moth/type/address/mac.hpp"
+#include "moth/type/container/fixed_array.hpp"
 
 /*
   template<typename cell_type_tt,
