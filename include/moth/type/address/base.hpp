@@ -10,6 +10,8 @@
 #include <iostream>
 #include <cctype>
 
+#include <arpa/inet.h>
+
 #include "moth/reporter/reporter.hpp"
 
 namespace moth
@@ -67,6 +69,16 @@ namespace moth
                         set(a_in_that);
                     }
 
+                    base_t(const char* a_in)
+                    {
+                        set(a_in);
+                    }
+
+                    base_t(const std::string& a_in)
+                    {
+                        set(a_in);
+                    }
+
                     ///////////////////////////////////////////////////////////////////
                     // MUTATORS
                     ///////////////////////////////////////////////////////////////////
@@ -91,13 +103,13 @@ namespace moth
 
                     inline base_t& set(const std::string& a_in)
                     {
-                        parser_tf(a_in, impl);
+                        parser_tf::convert(a_in, impl);
                         return *this;
                     }
 
                     inline base_t& set(const char* a_in)
                     {
-                        parser_tf(a_in, impl);
+                        parser_tf::convert(a_in, impl);
                         return *this;
                     }
 

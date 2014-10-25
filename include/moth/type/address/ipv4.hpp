@@ -59,38 +59,35 @@ namespace moth
                         static void convert(
                                 const char* a_in, cell_t* a_out)
                         {
-                            // TODO:xxx.xxx.xxx.xxx
-                            a_out[0] = 0;
-                            a_out[1] = 0;
-                            a_out[2] = 0;
-                            a_out[3] = 0;
-
                             moth::reporter::check(
                                     (nullptr != a_in),
                                     moth::reporter::severity_t::ERROR,
                                     "null ipv4 address passed");
-                            int l_begin = 0;
-                            int l_end = -1;
-                            for (int l_idx = 0; '\0' != a_in[l_idx]; ++l_idx)
-                            {
-                                char l_char = a_in[l_idx];
-                                //if (isdigit())
-                            }
+
+                            in_addr_t l_addr;
+
+                            moth::reporter::check(
+                                    -1 < (l_addr = inet_network(a_in)),
+                                    moth::reporter::severity_t::ERROR,
+                                    "null ipv4 address passed");
+
+
+                            convert((concat_t) l_addr, a_out);
                         }
 
                         static void convert(
                                 const std::string& a_in, cell_t* a_out)
                         {
-                            // TODO:
+                            convert(a_in.c_str(), a_out);
                         }
 
                         static void convert(
                                 concat_t a_in, cell_t* a_out)
                         {
-                            a_out[2] = (cell_t)((concat_t)(a_in & 0xFF000000) >> 24);
-                            a_out[3] = (cell_t)((concat_t)(a_in & 0x00FF0000) >> 16);
-                            a_out[4] = (cell_t)((concat_t)(a_in & 0x0000FF00) >> 8);
-                            a_out[5] = (cell_t)((concat_t)(a_in & 0x000000FF));
+                            a_out[0] = (cell_t)((concat_t)(a_in & 0xFF000000) >> 24);
+                            a_out[1] = (cell_t)((concat_t)(a_in & 0x00FF0000) >> 16);
+                            a_out[2] = (cell_t)((concat_t)(a_in & 0x0000FF00) >> 8);
+                            a_out[3] = (cell_t)((concat_t)(a_in & 0x000000FF));
                         }
                 };
             }
