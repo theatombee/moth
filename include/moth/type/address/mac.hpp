@@ -26,7 +26,7 @@ namespace moth
                 {
                     public:
 
-                        static void convert(
+                        static void convert_to_char_str(
                                 const cell_t* a_in, char* a_out)
                         {
                             sprintf(a_out,
@@ -34,23 +34,23 @@ namespace moth
                                     a_in[0],a_in[1],a_in[2],a_in[3],a_in[4],a_in[5]);
                         }
 
-                        static void convert(
+                        static void convert_to_str(
                                 const cell_t* a_in, std::string& a_out)
                         {
                             char l_buffer[20];
-                            convert(a_in, l_buffer);
+                            convert_to_char_str(a_in, l_buffer);
                             a_out = l_buffer;
                         }
 
-                        static std::string convert(const cell_t* a_in)
+                        static std::string convert_to_str(const cell_t* a_in)
                         {
                             char l_buffer[20];
-                            convert(a_in, l_buffer);
+                            convert_to_char_str(a_in, l_buffer);
                             return l_buffer;
                         }
 
-                        static void convert(
-                                const cell_t* a_in, concat_t a_out)
+                        static void convert_to_concat(
+                                const cell_t* a_in, concat_t& a_out)
                         {
                             a_out = (((concat_t) a_in[0]) << 40) |
                                     (((concat_t) a_in[1]) << 32) |
@@ -65,7 +65,7 @@ namespace moth
                 {
                     public:
 
-                        static void convert(
+                        static void convert_from_char_str(
                                 const char* a_in, cell_t* a_out)
                         {
                             moth::reporter::check(
@@ -90,13 +90,13 @@ namespace moth
                             }
                         }
 
-                        static void convert(
+                        static void convert_from_str(
                                 const std::string& a_in, cell_t* a_out)
                         {
-                            convert(a_in.c_str(), a_out);
+                            convert_from_char_str(a_in.c_str(), a_out);
                         }
 
-                        static void convert(
+                        static void convert_from_concat(
                                 concat_t a_in, cell_t* a_out)
                         {
                             a_out[0] = (cell_t)((concat_t)(a_in & 0xFF0000000000) >> 40);

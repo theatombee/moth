@@ -92,7 +92,7 @@ namespace moth
 
                     inline base_t& set(concat_t a_in)
                     {
-                        parser_tf::convert(a_in,impl);
+                        parser_tf::convert_from_concat(a_in,impl);
                         return *this;
                     }
 
@@ -104,13 +104,13 @@ namespace moth
 
                     inline base_t& set(const std::string& a_in)
                     {
-                        parser_tf::convert(a_in, impl);
+                        parser_tf::convert_from_str(a_in, impl);
                         return *this;
                     }
 
                     inline base_t& set(const char* a_in)
                     {
-                        parser_tf::convert(a_in, impl);
+                        parser_tf::convert_from_char_str(a_in, impl);
                         return *this;
                     }
 
@@ -179,7 +179,7 @@ namespace moth
 
                     inline void to_concat_t(concat_t& a_out) const
                     {
-                        formatter_tf::convert(impl,a_out);
+                        formatter_tf::convert_to_concat(impl,a_out);
                     }
 
                     inline concat_t to_concat_t() const
@@ -211,17 +211,17 @@ namespace moth
 
                     inline void to_string(char* a_out) const
                     {
-                        formatter_tf::convert(impl,a_out);
+                        formatter_tf::convert_to_char_str(impl,a_out);
                     }
 
                     inline void to_string(std::string& a_out) const
                     {
-                        formatter_tf::convert(impl,a_out);
+                        formatter_tf::convert_to_str(impl,a_out);
                     }
 
                     inline std::string to_string() const
                     {
-                        return formatter_tf::convert(impl);
+                        return formatter_tf::convert_to_str(impl);
                     }
 
                     ///////////////////////////////////////////////////////////////////

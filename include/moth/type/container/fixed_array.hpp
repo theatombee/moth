@@ -104,6 +104,16 @@ namespace moth
                         return lSeed;
                     }
 
+                    inline type_t* get()
+                    {
+                        return impl;
+                    }
+
+                    inline type_t const* get() const
+                    {
+                        return impl;
+                    }
+
                     inline iterator begin()
                     {
                         return impl;

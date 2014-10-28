@@ -19,7 +19,7 @@ namespace moth
                 {
                     public:
 
-                        static void convert(
+                        static void convert_to_char_str(
                                 const cell_t* a_in, char* a_out)
                         {
                             sprintf(a_out,
@@ -27,23 +27,23 @@ namespace moth
                                     a_in[0],a_in[1],a_in[2],a_in[3]);
                         }
 
-                        static void convert(
+                        static void convert_to_str(
                                 const cell_t* a_in, std::string& a_out)
                         {
                             char l_buffer[16];
-                            convert(a_in, l_buffer);
+                            convert_to_char_str(a_in, l_buffer);
                             a_out = l_buffer;
                         }
 
-                        static std::string convert(const cell_t* a_in)
+                        static std::string convert_to_str(const cell_t* a_in)
                         {
                             char l_buffer[16];
-                            convert(a_in, l_buffer);
+                            convert_to_char_str(a_in, l_buffer);
                             return l_buffer;
                         }
 
-                        static void convert(
-                                const cell_t* a_in, concat_t a_out)
+                        static void convert_to_concat(
+                                const cell_t* a_in, concat_t& a_out)
                         {
                             a_out = (((concat_t) a_in[0]) << 24) |
                                     (((concat_t) a_in[1]) << 16) |
@@ -56,32 +56,26 @@ namespace moth
                 {
                     public:
 
-                        static void convert(
+                        static void convert_from_char_str(
                                 const char* a_in, cell_t* a_out)
                         {
                             moth::reporter::check(
-                                    (nullptr != a_in),
+                                    (nullptr !=  a_in) &&
+                                    (0 < (inet_pton(
+                                            AF_INET,
+                                            a_in,
+                                            (in_addr*) a_out))),
                                     moth::reporter::severity_t::ERROR,
-                                    "null ipv4 address passed");
-
-                            in_addr_t l_addr;
-
-                            moth::reporter::check(
-                                    -1 < (l_addr = inet_network(a_in)),
-                                    moth::reporter::severity_t::ERROR,
-                                    "null ipv4 address passed");
-
-
-                            convert((concat_t) l_addr, a_out);
+                                    "invalid ipv4 address passed");
                         }
 
-                        static void convert(
+                        static void convert_from_str(
                                 const std::string& a_in, cell_t* a_out)
                         {
-                            convert(a_in.c_str(), a_out);
+                            convert_from_char_str(a_in.c_str(), a_out);
                         }
 
-                        static void convert(
+                        static void convert_from_concat(
                                 concat_t a_in, cell_t* a_out)
                         {
                             a_out[0] = (cell_t)((concat_t)(a_in & 0xFF000000) >> 24);

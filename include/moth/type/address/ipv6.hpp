@@ -20,43 +20,47 @@ namespace moth
             namespace ipv6_impl
             {
                 using cell_t = uint8_t;
-                using concat_t = uint32_t;
-                const int size = 4;
+                using concat_t = moth::type::container::fixed_array_t<uint8_t,16>;
+                const int size = 16;
+
+                // TODO:::::::
 
                 struct formatter_f
                 {
                     public:
 
-                        static void convert(
+                        static void convert_to_char_str(
                                 const cell_t* a_in, char* a_out)
                         {
-                            sprintf(a_out,
-                                    "%d.%d.%d.%d",
-                                    a_in[0],a_in[1],a_in[2],a_in[3]);
+                            moth::reporter::check(
+                                    (0 != inet_ntop(
+                                            AF_INET6,
+                                            a_in,
+                                            a_out,
+                                            INET6_ADDRSTRLEN)),
+                                    moth::reporter::severity_t::ERROR,
+                                    "null ipv6 address passed");
                         }
 
-                        static void convert(
+                        static void convert_to_str(
                                 const cell_t* a_in, std::string& a_out)
                         {
                             char l_buffer[16];
-                            convert(a_in, l_buffer);
+                            convert_to_char_str(a_in, l_buffer);
                             a_out = l_buffer;
                         }
 
-                        static std::string convert(const cell_t* a_in)
+                        static std::string convert_to_str(const cell_t* a_in)
                         {
                             char l_buffer[16];
-                            convert(a_in, l_buffer);
+                            convert_to_char_str(a_in, l_buffer);
                             return l_buffer;
                         }
 
-                        static void convert(
-                                const cell_t* a_in, concat_t a_out)
+                        static void convert_to_concat(
+                                const cell_t* a_in, concat_t& a_out)
                         {
-                            a_out = (((concat_t) a_in[0]) << 24) |
-                                    (((concat_t) a_in[1]) << 16) |
-                                    (((concat_t) a_in[2]) << 8)  |
-                                     ((concat_t) a_in[3]);
+                            memcpy(a_out, a_in, size);
                         }
                 };
 
@@ -64,38 +68,30 @@ namespace moth
                 {
                     public:
 
-                        static void convert(
+                        static void convert_from_char_str(
                                 const char* a_in, cell_t* a_out)
                         {
                             moth::reporter::check(
-                                    (nullptr != a_in),
+                                    (nullptr !=  a_in) &&
+                                    (0 < (inet_pton(
+                                            AF_INET6,
+                                            a_in,
+                                            (in6_addr*) a_out))),
                                     moth::reporter::severity_t::ERROR,
-                                    "null ipv6 address passed");
+                                    "invalid ipv6 address passed");
 
-                            in_addr_t l_addr;
-
-                            moth::reporter::check(
-                                    -1 < (l_addr = inet_network(a_in)),
-                                    moth::reporter::severity_t::ERROR,
-                                    "null ipv6 address passed");
-
-
-                            convert((concat_t) l_addr, a_out);
                         }
 
-                        static void convert(
+                        static void convert_from_str(
                                 const std::string& a_in, cell_t* a_out)
                         {
-                            convert(a_in.c_str(), a_out);
+                            convert_from_char_str(a_in.c_str(), a_out);
                         }
 
-                        static void convert(
-                                concat_t a_in, cell_t* a_out)
+                        static void convert_from_concat(
+                                const concat_t& a_in, cell_t* a_out)
                         {
-                            a_out[0] = (cell_t)((concat_t)(a_in & 0xFF000000) >> 24);
-                            a_out[1] = (cell_t)((concat_t)(a_in & 0x00FF0000) >> 16);
-                            a_out[2] = (cell_t)((concat_t)(a_in & 0x0000FF00) >> 8);
-                            a_out[3] = (cell_t)((concat_t)(a_in & 0x000000FF));
+                            memcpy((void*)a_in.get(), (void*)a_out, size);
                         }
                 };
             }
